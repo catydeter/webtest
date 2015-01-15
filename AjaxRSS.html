@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Async Ajax Template</title>
+<style type="text/css">
+
+  .news{
+       
+        width: 800px;
+        padding:10px;
+       
+   
+   }
+   .title{
+      padding:1px;
+      font-size: 1.25em;
+      font-weight:bold;
+      color: #0080FF;
+      margin: 5px 1px 1px 1px ;
+   }
+   .pubDate{
+      font-size: 0.5em;
+      color:#6C6C6C;
+   }
+   .link{
+      font-size: 0.5em;
+      color: #6A6AFF;
+     
+   }
+   .elehr{
+      color: #0080FF;
+      border-color: #0080FF;
+   }
+   .description{
+       padding:5px;
+       mpargin:5px;
+   }
+
+</style>
+<script>
+  window.onload = function(){
+	  var btnLoad = document.getElementById("buttonLoad");
+	  btnLoad.onclick = load;
+  }
+  var xmlHttp;
+  function load(){
+	  //步驟一建立XMLHttpReques物件
+	  xmlHttp = new XMLHttpRequest();
+	  
+	 //步驟二對server端發出要求
+	  xmlHttp.onreadystatechange = returnData;
+	  var url="LoadRSS.jsp";
+	  xmlHttp.open("get",url,true); //true 表示非同步
+	  xmlHttp.send();
+	 
+  }
+  //步驟三處理server端回傳的結果
+  function returnData(){ 
+	  var divShow = document.getElementById("div1");
+	  //判斷divShow中有無table
+	  if(divShow.hasChildNodes()){    
+		  divShow.removeChild(divShow.childNodes[0]);
+	  }
+	  
+	
+	  var theTitle="";
+	  if(xmlHttp.readyState == 4){
+		  if(xmlHttp.status == 200){
+			  	var doc = xmlHttp.responseXML;	
+			  	//var titles=doc.getElementsByTagName("title");
+			  	var items=doc.getElementsByTagName("item");
+			  	var newdiv = document.createElement("div");
+			  	newdiv.setAttribute("class","news");		  				  	
+			  	for(var i=0,max=items.length;i<max;i++){
+			  		var title= items[i].getElementsByTagName("title")[0].firstChild.nodeValue;			  				  		
+			  		var description=items[i].getElementsByTagName("description")[0].firstChild.nodeValue;
+			  		var pubDate=items[i].getElementsByTagName("pubDate")[0].firstChild.nodeValue;
+			  		var link=items[i].getElementsByTagName("link")[0].firstChild.nodeValue;
+			  		console.log(description);
+			  		
+			  		var txtTitle= document.createTextNode(title);			  		
+			  		var eletitle=document.createElement("div");
+			  		eletitle.setAttribute("class","title");
+			  		eletitle.appendChild(txtTitle);
+			  		
+			  		var eleHr=document.createElement("hr");
+			  		eleHr.setAttribute("class","elehr");
+			  		
+			  		var txtPubDate=document.createTextNode(pubDate);
+			  		var elePubDate=document.createElement("div");
+			  		elePubDate.setAttribute("class","pubDate");
+			  		elePubDate.appendChild(txtPubDate);
+			  		
+			  		//var txtDescription= document.createTextNode(description);
+			  		var eleDescription=document.createElement("div");
+			  		eleDescription.innerHTML=description;
+			  		eleDescription.setAttribute("class","description");
+				  	
+				  	var txtLink=document.createTextNode("詳全文:"+title);
+				  	var eleLink=document.createElement("a");
+				  	eleLink.setAttribute("href",link);
+				  	eleLink.setAttribute("class",link);
+				  	eleLink.appendChild(txtLink);
+				  	
+				  	newdiv.appendChild(eletitle);
+				  	newdiv.appendChild(eleHr);
+				  	newdiv.appendChild(elePubDate);
+				  	newdiv.appendChild(eleDescription);
+				  	newdiv.appendChild(eleLink);
+				  	
+			  	
+			  	}
+			  	
+			  	divShow.appendChild(newdiv);
+		  }else{
+			  divShow.innerHTML = xmlHttp.status + ":" + xmlHttp.statusText;
+		  }
+	  }
+	  
+  }
+</script>
+</head>
+<body>
+  <input type="button" value="Load..." id="buttonLoad">
+  <div id="div1"></div>
+</body>
+</html>
